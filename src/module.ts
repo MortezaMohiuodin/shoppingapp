@@ -3,6 +3,9 @@ import cookieSession from 'cookie-session'
 import * as dotenv from 'dotenv'
 import cors from 'cors'
 import mongoose from 'mongoose'
+import { errorHandler } from '@shp_ahmad5five/common'
+
+
 dotenv.config()
 import  {Application} from 'express'
 export class AppModule{
@@ -20,6 +23,7 @@ export class AppModule{
             signed:false,
             secure:false
         }))
+        app.use(errorHandler)
     }
     async start(){
         if(!process.env.MONGO_URI){
