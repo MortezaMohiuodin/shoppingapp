@@ -14,7 +14,7 @@ export class AppModule{
             optionsSuccessStatus:200
         }))
 
-        app.use(urlencoded({extended:true}))
+        app.use(urlencoded({extended:false}))
         app.use(json())
         app.use(cookieSession({
             signed:false,
