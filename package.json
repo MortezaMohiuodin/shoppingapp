@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@shp_ahmad5five/common": "^1.0.4",
     "@types/body-parser": "^1.19.5",
     "@types/cookie-session": "^2.0.49",
     "@types/cors": "^2.8.17",
