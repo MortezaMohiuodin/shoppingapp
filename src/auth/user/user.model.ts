@@ -1,4 +1,4 @@
-import mongoose, { mongo } from 'mongoose'
+import mongoose from 'mongoose'
 import {UserModel , UserDoc , AuthenticationService} from '@shp_ahmad5five/common'
 
 const schema = new mongoose.Schema({
@@ -12,6 +12,7 @@ const schema = new mongoose.Schema({
     }
 },{
     toJSON : {
+        // get user without password
         transform (doc,ret){
             ret.id = ret._id
             delete ret._id
@@ -19,8 +20,9 @@ const schema = new mongoose.Schema({
         }
     }
 })
-
+// do before save , (this)is the model
 schema.pre('save',async function(done){
+    // if new password , hash and save 
     const authenticationService = new AuthenticationService()
     if(this.isModified('password') || this.isNew){
         const hashedPwd = authenticationService.pwdToHash(this.get('password'))

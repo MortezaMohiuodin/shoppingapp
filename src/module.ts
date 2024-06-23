@@ -1,16 +1,18 @@
+import mongoose from 'mongoose'
 import {json, urlencoded } from 'body-parser'
 import cookieSession from 'cookie-session'
 import * as dotenv from 'dotenv'
 import cors from 'cors'
-import mongoose from 'mongoose'
 import { errorHandler } from '@shp_ahmad5five/common'
+import  {Application} from 'express'
 
+// routers
+import { authRouters } from './auth/auth.routers'
 
 dotenv.config()
-import  {Application} from 'express'
-import { authRouters } from './auth/auth.routers'
 export class AppModule{
     constructor(public app: Application){
+        // express app init
         app.set('trust-proxy',true)
         app.use(cors({
             origin:"*",
@@ -28,6 +30,7 @@ export class AppModule{
         app.use(errorHandler)
     }
     async start(){
+        // connect to database and listen to port
         if(!process.env.MONGO_URI){
             throw new Error('mongo uri must be defined')
         }
