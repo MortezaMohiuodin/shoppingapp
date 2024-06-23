@@ -6,7 +6,8 @@ import { AppModule } from "./module"
 declare global {
     namespace Express {
         interface Request {
-            currentUser?: JwtPayload
+            currentUser?: JwtPayload;
+            uploaderError:Error
         }
     }
 }
