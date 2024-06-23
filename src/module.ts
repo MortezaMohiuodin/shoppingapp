@@ -8,6 +8,7 @@ import { errorHandler } from '@shp_ahmad5five/common'
 
 dotenv.config()
 import  {Application} from 'express'
+import { authRouters } from './auth/auth.routers'
 export class AppModule{
     constructor(public app: Application){
         app.set('trust-proxy',true)
@@ -23,6 +24,7 @@ export class AppModule{
             signed:false,
             secure:false
         }))
+        app.use(authRouters)
         app.use(errorHandler)
     }
     async start(){

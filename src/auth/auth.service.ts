@@ -10,21 +10,21 @@ export class AuthService{
     ){
 
     }
-    async signup(AuthDto:AuthDto,errCallback:NextFunction){
+    async signup(AuthDto:AuthDto){
         const existingUser = await this.userService.findOneByEmail(AuthDto.email)
-        if(existingUser) return errCallback(new BadRequestError('A user with same email exists!'))
+        if(existingUser) return {message:'A user with same email exists!'}
         const newUser = await this.userService.create(AuthDto)
         
         const jwt = this.authenticationService.generateJwt({email:AuthDto.email, userId :  newUser.id} , process.env.JWT_KEY!)
-        return jwt
+        return {jwt}
     }
-    async signin(signinDto:AuthDto,errCallback:NextFunction){
+    async signin(signinDto:AuthDto){
         const user = await this.userService.findOneByEmail(signinDto.email)
-        if(!user) return errCallback(new BadRequestError('wrong Credintials'))
+        if(!user) return {message:'Wrong credentials!'}
         const _samePwd = this.authenticationService.pwdCompare(user.password,signinDto.password)
-        if(!_samePwd) return errCallback(new BadRequestError('wrong Credintials'))     
+        if(!_samePwd) return {message:'Wrong credentials!'}
         const jwt = this.authenticationService.generateJwt({email:user.email, userId :  user.id} , process.env.JWT_KEY!)
-        return jwt
+        return {jwt}
     }
 
 }

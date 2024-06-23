@@ -1,4 +1,6 @@
-import { JwtPayload } from "@shp_ahmad5five/common/build/constants/globals"
+import { JwtPayload } from "@shp_ahmad5five/common"
+import { AppModule } from "./module"
+
 declare global {
     namespace Express {
         interface Request {
@@ -7,8 +9,6 @@ declare global {
     }
 }
 
-import { JwtPayload } from "@shp_ahmad5five/common/build/constants/globals"
-import { AppModule } from "./module"
 import express from 'express'
 const bootstrap = ()=>{
     const app = new AppModule(express())
