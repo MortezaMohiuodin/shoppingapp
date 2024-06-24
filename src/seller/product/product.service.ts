@@ -29,7 +29,8 @@ export class ProductService {
             images = files ? [...files] : []
         }
         return images.map((file:Express.Multer.File)=>{
-            let srcObj = {src:this.generateBase64Url(file.mimetype,file.buffer)}
+            const fileBuffer = fs.readFileSync(path.join(uploadDir + file.filename))
+            let srcObj = {src:this.generateBase64Url(file.mimetype,fileBuffer)}
             fs.unlink(path.join(uploadDir + file.filename),()=>{
 
             })
