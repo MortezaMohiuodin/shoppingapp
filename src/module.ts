@@ -3,7 +3,7 @@ import {json, urlencoded } from 'body-parser'
 import cookieSession from 'cookie-session'
 import * as dotenv from 'dotenv'
 import cors from 'cors'
-import { errorHandler } from '@shp_ahmad5five/common'
+import { errorHandler , currentUser } from '@shp_ahmad5five/common'
 import  {Application} from 'express'
 
 // routers
@@ -26,8 +26,7 @@ export class AppModule{
             signed:false,
             secure:false
         }))
-        app.use(authRouters)
-        app.use(errorHandler)
+     
     }
     async start(){
         // connect to database and listen to port
@@ -43,6 +42,9 @@ export class AppModule{
         }catch(err){
             throw new Error('database connection failed')
         }
+        this.app.use(currentUser(process.env.JWT_KEY!))
+        this.app.use(authRouters)
+        this.app.use(errorHandler)
         this.app.listen(8080,()=>console.log("port 8080"))
     }
 }

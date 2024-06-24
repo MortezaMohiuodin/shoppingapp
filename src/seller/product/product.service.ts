@@ -1,8 +1,9 @@
-import { ProductModel } from "@shp_ahmad5five/common";
+import { ProductModel  } from "@shp_ahmad5five/common";
 import { Product } from "./product.model";
 import { CreateProductDto } from "../dtos/product.dto";
 import fs from 'fs'
 import path from 'path'
+const uploadDir = 'upload/'
 export class ProductService {
     constructor(public productModel:ProductModel){
 
@@ -29,7 +30,7 @@ export class ProductService {
         }
         return images.map((file:Express.Multer.File)=>{
             let srcObj = {src:this.generateBase64Url(file.mimetype,file.buffer)}
-            fs.unlink(path.join('upload/' + file.filename),()=>{
+            fs.unlink(path.join(uploadDir + file.filename),()=>{
 
             })
             return srcObj
