@@ -17,7 +17,7 @@ router.post('/product/new',requireAuth,async (req:Request,res:Response,next:Next
     if(!req.files) return next(new BadRequestError('images are required'))
     if(req.uploaderError) return next(new BadRequestError(req.uploaderError.message))
     // create product
-    const prodcut = await sellerService.addProduct({title,price,userId:req.currentUser!.userId, files:req.files})
+    const product = await sellerService.addProduct({title,price,userId:req.currentUser!.userId, files:req.files})
     // send to user
     res.status(201).send(product)
 })
@@ -28,3 +28,13 @@ router.post('/product/:id/update',requireAuth,async(req:Request,res:Response,nex
     if(result instanceof CustomError) return next(result)
     res.status(200).send(result)
 })
+
+router.delete('/proudct/:id/delete',requireAuth,async(req:Request,res:Response,next:NextFunction)=>{
+    const {id} = req.params
+    const result = await sellerService.deleteProduct({productId:id,userId:req.currentUser!.userId})
+    if(result instanceof CustomError) return next(result)
+    res.status(200).send(result)
+})
+
+
+export {router as sellerRouters}
