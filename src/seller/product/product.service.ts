@@ -1,6 +1,6 @@
 import { ProductModel  } from "@shp_ahmad5five/common";
 import { Product } from "./product.model";
-import { CreateProductDto, UpdateProductDto , DeleteProductDto } from "../dtos/product.dto";
+import { CreateProductDto, UpdateProductDto , DeleteProductDto, AddImagesDto,DeleteImagesDto } from "../dtos/product.dto";
 import fs from 'fs'
 import path from 'path'
 const uploadDir = 'upload/'
@@ -27,6 +27,13 @@ export class ProductService {
     }
     async deleteProduct(deleteProductDto:DeleteProductDto){
         return await this.productModel.findOneAndDelete({_id:deleteProductDto.productId})
+    }
+    async addImages(addImagesDto:AddImagesDto){
+        const images = this.generateProductImages(addImagesDto.files)
+        return await this.productModel.findOneAndUpdate({_id:addImagesDto.productId},{$push:{ images:{$each:images}}},{new:true})
+    }
+    async deleteImages(deleteImagesDto : DeleteImagesDto){
+        return await this.productModel.findOneAndUpdate({_id:deleteImagesDto.productId},{$pull:{images:{_id : {$in : deleteImagesDto.imagesId}}}},{new:true})
     }
     generateBase64Url(contentType:string,buffer:Buffer){
         return `data:${contentType}:base64,${buffer.toString('base64')}`

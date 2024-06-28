@@ -36,5 +36,24 @@ router.delete('/proudct/:id/delete',requireAuth,async(req:Request,res:Response,n
     res.status(200).send(result)
 })
 
+router.post('/proudct/:id/add-images',requireAuth,multipleFilesMiddleware,async(req:Request,res:Response,next:NextFunction)=>{
+    const {id} = req.params
+    if(!req.files) return next(new BadRequestError('images are required'))
+    if(req.uploaderError) return next(new BadRequestError(req.uploaderError.message))
+    const files = req.files
+    const result = await sellerService.addProductImages({productId:id,userId:req.currentUser!.userId,files})
+    if(result instanceof CustomError) return next(result)
+    res.status(200).send(result)
+})
+
+router.post('/proudct/:id/delete-images',requireAuth,async(req:Request,res:Response,next:NextFunction)=>{
+    const {id} = req.params
+    const {imagesIds} = req.body
+    const result = await sellerService.deleteProductImages({productId:id,userId:req.currentUser!.userId,imagesIds})
+    if(result instanceof CustomError) return next(result)
+    res.status(200).send(result)
+})
+
+
 
 export {router as sellerRouters}

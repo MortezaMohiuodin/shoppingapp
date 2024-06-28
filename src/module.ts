@@ -8,6 +8,7 @@ import  {Application} from 'express'
 
 // routers
 import { authRouters } from './auth/auth.routers'
+import { sellerRouters } from './seller/seller.routers'
 
 dotenv.config()
 export class AppModule{
@@ -44,6 +45,7 @@ export class AppModule{
         }
         this.app.use(currentUser(process.env.JWT_KEY!))
         this.app.use(authRouters)
+        this.app.use(sellerRouters)
         this.app.use(errorHandler)
         this.app.listen(8080,()=>console.log("port 8080"))
     }
