@@ -13,6 +13,6 @@ const schema = new mongoose.Schema({
             ref:"CartProduct"
         }
     ],
-    totalPrice:{type:Number,required:true}
+    totalPrice:{type:Number,required:true , default : 0}
 })
 export const Cart = mongoose.model<CartDoc,CartModel>("Cart",schema)
