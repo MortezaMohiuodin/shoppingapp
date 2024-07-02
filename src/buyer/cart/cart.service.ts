@@ -17,16 +17,40 @@ export class CartService {
         return await cart.save()
     }
     async createCartProduct(createCartProductDto:CreateCartProductDto){
-        const cartProdcut = new this.cartProduct({
+        const cartProduct = new this.cartProductModel({
             cart : createCartProductDto.cartId,
             product:createCartProductDto.productId,
             quantity:createCartProductDto.quantity
         })
-
+        return await cartProduct.save()
+    }
+    async isProductInCart(cartId:string,productId:string){
+        return  !!(await this.cartProductModel.findOne({cartId,product:productId}))
+    }
+    async updateProductQuantity(cartId:string,productId:string,options:{inc:boolean,amount:number}){
+        const {inc,amount} = options;
+        const cartProduct = await this.cartProductModel.findOne({product:productId})
+        if(!cartProduct) return null
+        if(cartProduct.quantity < amount && !inc){
+            // remove product 
+        } 
+        const updatedCartProduct = await this.cartProductModel.findOneAndUpdate({id:cartProduct._id},
+            {$inc: {quantity: inc ? amount : -amount}},{new:true}
+        ).populate('product')
+        const newPrice = inc ? updatedCartProduct!.product.price * amount  : -(updatedCartProduct!.product.price * amount)
+        const updatedCart = await this.cartModel.findOneAndUpdate({_id:cartId},
+           { $inc : {totalPrice:newPrice}},{new:true}
+        )
     }
     async addProduct(addProductToCardDto:AddProductToCardDto , product:ProductDoc){
         const {userId,quantity,productId} = addProductToCardDto
         let cart = await this.findOneByUserId(userId)
+
+        // if the product in cart => quantity += 1
+        const isProductInCart = cart && await this.isProductInCart(cart._id,productId)
+        
+        if(isProductInCart && cart) return this.updateProductQuantity(cart._id,productId, {inc:true , amount:quantity})
+
         if(!cart) cart = await this.createCart(userId)
         const cartProduct = await this.createCartProduct({cartId:cart._id , productId,quantity})
         return await this.cartModel.findOneAndUpdate({_id:cart._id},
