@@ -8,3 +8,7 @@ export interface CreateCartProductDto{
     quantity:number;
     productId:string
 }
+export interface RemoveProductFromCartDto{
+    cartId:string;
+    productId:string;
+}

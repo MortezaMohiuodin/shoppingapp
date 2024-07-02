@@ -1,7 +1,7 @@
 import {CartModel,CartProductModel,ProductDoc} from "@shp_ahmad5five/common"
 import { CartProduct } from "./cart-product.model"
 import { Cart } from "./cart.model"
-import { AddProductToCardDto,CreateCartProductDto } from "../dtos/cart.dto"
+import { AddProductToCardDto,CreateCartProductDto ,RemoveProductFromCartDto} from "../dtos/cart.dto"
 export class CartService {
     constructor(
         public cartModel : CartModel,
@@ -27,12 +27,22 @@ export class CartService {
     async isProductInCart(cartId:string,productId:string){
         return  !!(await this.cartProductModel.findOne({cartId,product:productId}))
     }
+    async removeProductFromCart(removeProductFromCartDto:RemoveProductFromCartDto){
+        const {cartId,productId}= removeProductFromCartDto
+        const cartProduct = await this.cartProductModel.findOne({product:productId}).populate('product')
+        if(!cartProduct) return null
+        const deletedDoc = await this.cartProductModel.findOneAndRemove({_id:cartProduct._id})
+        if(!deletedDoc) return null
+        return await this.cartModel.findOneAndUPdate({_id:cartId},
+            {$pull : {products:cartProduct._id}, $inc : {totalPrice: -(cartProduct.product.price * cartProduct.quantity)}}, {new:true}
+        )
+    }
     async updateProductQuantity(cartId:string,productId:string,options:{inc:boolean,amount:number}){
         const {inc,amount} = options;
         const cartProduct = await this.cartProductModel.findOne({product:productId})
         if(!cartProduct) return null
         if(cartProduct.quantity < amount && !inc){
-            // remove product 
+            return await this.removeProductFromCart({cartId,productId})
         } 
         const updatedCartProduct = await this.cartProductModel.findOneAndUpdate({id:cartProduct._id},
             {$inc: {quantity: inc ? amount : -amount}},{new:true}
