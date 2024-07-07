@@ -1,6 +1,6 @@
 import {CartService , cartService} from './cart/cart.service'
 import { ProductService,productService } from '../seller/product/product.service'
-import { AddProductToCardDto } from './dtos/cart.dto'
+import { AddProductToCardDto , UpdateCartProductQuantityDto } from './dtos/cart.dto'
 import { BadRequestError } from '@shp_ahmad5five/common'
 
 export class BuyerService {
@@ -13,6 +13,9 @@ export class BuyerService {
         if(!product) return new BadRequestError('Product not found!')
 
         return await this.cartService.addProduct(addProductToCartDto,product)
+    }
+    async updateCartProductQuantity(updateCartProductQuantity:UpdateCartProductQuantityDto){
+        
     }
 }
 export const buyerService = new BuyerService(cartService,productService)

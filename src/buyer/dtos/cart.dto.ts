@@ -12,3 +12,8 @@ export interface RemoveProductFromCartDto{
     cartId:string;
     productId:string;
 }
+export interface UpdateCartProductQuantityDto {
+    cartId : string,
+    productId:string,
+    options:{inc:boolean,amount:number}
+}
