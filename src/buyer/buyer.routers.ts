@@ -8,6 +8,7 @@ router.post('/cart/add',requireAuth,async (req:Request,res:Response,next:NextFun
     const {productId,quantity} = req.body
     const result = await buyerService.addProductToCart({productId,quantity,userId:req.currentUser!.userId})
     if(result instanceof CustomError || result instanceof Error) return next(result)
+    req.session = {...req.session,cartId:result._id}    
     res.status(200).send(result)
 })
 
@@ -22,5 +23,19 @@ router.post('/cart/:cartId/product/:id/update-quantity',async (req:Request,res:R
     res.status(200).send(result)
 })
 
+router.post('/cart/delete/product',async (req:Request,res:Response,next:NextFunction)=>{
+    const {cartId,productId} = req.body
+    const result = await buyerService.removeProductFromCart({cartId,productId})
+    if(result instanceof CustomError || result instanceof Error) return next(result)
+    res.status(200).send(result)
+})
+
+router.post('/get/cart/:cartId',async (req:Request,res:Response,next:NextFunction)=>{
+    const cartId  = req.session.cartId
+    if(!cartId) return next(new BadRequestError('cartId is required!'))
+    const result = await buyerService.getCart(cartId,req.currentUser!.userId)
+    if(result instanceof CustomError || result instanceof Error) return next(result)
+    res.status(200).send(result)
+})
 
 export {router as buyerRouters}

@@ -30,6 +30,11 @@ export class CartService {
     async isProductInCart(cartId:string,productId:string){
         return  !!(await this.cartProductModel.findOne({cartId,product:productId}))
     }
+
+    async getCart(cartId:string){
+        return await this.cartModel.findOne({_id:cartId})
+    }
+
     async removeProductFromCart(removeProductFromCartDto:RemoveProductFromCartDto){
         const {cartId,productId}= removeProductFromCartDto
         const cartProduct = await this.cartProductModel.findOne({product:productId}).populate('product')
