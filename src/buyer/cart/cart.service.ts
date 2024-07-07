@@ -10,6 +10,9 @@ export class CartService {
     async findOneByUserId(userId:string){
         return await this.cartModel.findOne({user:userId})
     }
+    async getCartProductById(productId:string,cartId:string){
+        return await this.cartProductModel.findOne({product:productId,cart:cartId})
+    }
     async createCart(userId:string){
         const cart = new this.cartModel({
             user:userId

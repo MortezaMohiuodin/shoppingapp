@@ -14,8 +14,11 @@ export class BuyerService {
 
         return await this.cartService.addProduct(addProductToCartDto,product)
     }
-    async updateCartProductQuantity(updateCartProductQuantity:UpdateCartProductQuantityDto){
-        
+    async updateCartProductQuantity(updateCartProductQuantityDto:UpdateCartProductQuantityDto){
+        const {productId,cartId} = updateCartProductQuantityDto
+        const cartProduct = await this.cartService.getCartProductById(productId,cartId)
+        if(!cartProduct) return new BadRequestError('product not found in cart')
+        return await this.cartService.updateProductQuantity(updateCartProductQuantityDto)
     }
 }
 export const buyerService = new BuyerService(cartService,productService)
