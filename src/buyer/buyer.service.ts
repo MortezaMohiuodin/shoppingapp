@@ -3,10 +3,12 @@ import { ProductService,productService } from '../seller/product/product.service
 import { AddProductToCardDto , UpdateCartProductQuantityDto , RemoveProductFromCartDto } from './dtos/cart.dto'
 import { BadRequestError, NotAuthorizedError } from '@shp_ahmad5five/common'
 import Stripe from 'stripe'
+import { OrderService , orderService } from './order/order.service'
 export class BuyerService {
     constructor(
         public cartService:CartService,
-        public productService:ProductService
+        public productService:ProductService,
+        public orderService:OrderService,
         public stripeService : Stripe
     ){}
     async addProductToCart(addProductToCartDto:AddProductToCardDto){
@@ -68,11 +70,25 @@ export class BuyerService {
             customer : customer_id
         })
         if(!charge) return new BadRequestError('Invalid data! could not create the charge')
-        // create new order 
+        // create new order
+        await this.orderService.createOrder({userId,totalAmount:cart.totalPric,chargeId:charge.id})
         // clear cart
         await this.cartService.clearCart(userId,cart._id)
         return charge
     }
-
+    async updateCustomerStripeCart(userId:string,newCartToken:string){
+        const cart = await this.cartService.findOneByUserId(userId)
+        if(!cart) return new BadRequestError('your cart is empty!')
+        if(!cart.customer_id) return new BadRequestError('your a customer!')
+        try {
+            await this.stripeService.customers.update(cart.customer_id,{
+                source: newCartToken
+            })
+        } catch (err) {
+            return new Errr('cart update failed')
+        }
+        return true
+    }
 }
-export const buyerService = new BuyerService(cartService,productService,new Stripe(process.env.STRIPE_KEY!,{apiVersion:'2024-06-20'}))
+export const buyerService = new BuyerService(cartService,productService,orderService,
+    new Stripe(process.env.STRIPE_KEY!,{apiVersion:'2024-06-20'}))

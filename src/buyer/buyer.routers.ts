@@ -31,11 +31,23 @@ router.post('/cart/delete/product',async (req:Request,res:Response,next:NextFunc
 })
 
 router.post('/get/cart/:cartId',async (req:Request,res:Response,next:NextFunction)=>{
-    const cartId  = req.session.cartId
+    const cartId  = req.session?.cartId
     if(!cartId) return next(new BadRequestError('cartId is required!'))
     const result = await buyerService.getCart(cartId,req.currentUser!.userId)
     if(result instanceof CustomError || result instanceof Error) return next(result)
     res.status(200).send(result)
 })
 
+router.post('/payment/checkout/',async (req:Request,res:Response,next:NextFunction)=>{
+    const {cartToken} = req.body
+    const result = await buyerService.checkout(req.currentUser!.userId,cartToken, req.currentUser!.email)
+    if(result instanceof CustomError) return next(result)
+        res.status(200).send(result)
+})
+router.post('/payment/cart/update',async (req:Request,res:Response,next:NextFunction)=>{
+    const {cartToken} = req.body
+    const result = await buyerService.updateCustomerStripeCart(req.currentUser!.userId,cartToken)
+    if(result instanceof CustomError || result instanceof Error) return next(result)
+        res.status(200).send(result)
+})
 export {router as buyerRouters}
