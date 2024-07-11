@@ -42,19 +42,35 @@ export class BuyerService {
         const cart = await this.cartService.findOneByUserId(userId)
         if(!cart) return new BadRequestError('your cart is empty')
         if(cart.products.length === 0) return new BadRequestError('your cart is empty')
+        
+        let customer_id :string
+
+        if(cart.customer_id){
+            customer_id = cart.customer_id
+        }else{
+            const {id} = await this.stripeService.customers.create({
+                email:userEmail,
+                source:cartToken
+            })
+            customer_id = id
+            await cart.set({customer_id}).save()
+        }
+        
         const {id} = await this.stripeService.customers.create({
             email: userEmail,
             source:cartToken
         })
         if(!id) return new BadRequestError('invalid data')
+        if(!customer_id) return new BadRequestError('Invalid date')
         const charge = await this.stripeService.charges.create({
             amount: cart.totalPrice * 100,
             currency : 'usd',
-            customer : id
+            customer : customer_id
         })
         if(!charge) return new BadRequestError('Invalid data! could not create the charge')
         // create new order 
         // clear cart
+        await this.cartService.clearCart(userId,cart._id)
         return charge
     }
 

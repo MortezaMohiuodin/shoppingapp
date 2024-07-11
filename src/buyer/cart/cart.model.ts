@@ -13,6 +13,7 @@ const schema = new mongoose.Schema({
             ref:"CartProduct"
         }
     ],
-    totalPrice:{type:Number,required:true , default : 0}
+    totalPrice:{type:Number,required:true , default : 0},
+    customer_id : {type : String}
 })
 export const Cart = mongoose.model<CartDoc,CartModel>("Cart",schema)
