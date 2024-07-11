@@ -37,6 +37,9 @@ export class AppModule{
         if(!process.env.JWT_KEY){
             throw new Error('jwt key must be defined')
         }
+        if(!process.env.STRIPE_KEY){
+            throw new Error('stripe key must be defined')
+        }
 
         try{
             await mongoose.connect(process.env.MONGO_URI)
